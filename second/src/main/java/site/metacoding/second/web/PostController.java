@@ -1,55 +1,55 @@
 package site.metacoding.second.web;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+import site.metacoding.second.domain.Post;
+
+@Controller
 public class PostController {
+    // View (글 쓰기 페이지, 글 목록 페이지, 글 상세보기 페이지) - 전부 GET
 
-    // SELECT * FROM post WHERE id = ?
-    // 구체적으로 뭘 달라고 요청해야함 - body X
-    @GetMapping("/post/{id}")
-    public String test1(@PathVariable int id) {
-        return "주세요 id : " + id;
+    @GetMapping("/post/writeForm")
+    public String writeForm() {
+
+        return "post/writeForm";
     }
 
-    // SELECT * FROM post WHERE title = ? (제목은 동일한게 있을 수 있다, pk가 아닌 것)
-    // 구체적으로 뭘 달라고 요청해야함 - body X
-    // http://localhost:8000/post?title=? 와 같다
-    @GetMapping("/post")
-    public String search(String title) {
+    @GetMapping("/post/list")
+    public String list(Model model) {
+        List<Post> posts = new ArrayList<>();
+        Post post1 = new Post(1, "제목1", "내용1");
+        Post post2 = new Post(2, "제목2", "내용2");
+        Post post3 = new Post(3, "제목3", "내용3");
+        Post post4 = new Post(4, "제목4", "내용4");
+        Post post5 = new Post(5, "제목5", "내용5");
 
-        // String title = request.getParameter("title"); 이런 방식인데 훨씬 쉽구나
-        return "주세요 title : " + title;
+        posts.add(post1);
+        posts.add(post2);
+        posts.add(post3);
+        posts.add(post4);
+        posts.add(post5);
+
+        model.addAttribute("posts", posts);
+
+        return "post/list";
     }
 
-    // http://localhost:8000/post
-    // body : title=제목1&content=내용1
-    // header : Content-Type : application/x-www-form-urlencoded 란다~
-    // request.getParameter() 메서드가 스프링 기본 파싱 전략
-    // 뭘 줘야 함 - body O
-    @PostMapping("/post")
-    public String test2(String title, String content) {
-        return "줄게요 title : " + title + ", content : " + content;
+    @GetMapping("/post/detail")
+    public String detail(Model model) {
+        // 1. db에 연결해서 SELECT 해야한다.
+        // 2.ResultSet을 JavaObjsect로 변경해야한다.
+        Post post = new Post(1, "제목1", "내용1");
+        // 3.Request 에 담아주기.
+        model.addAttribute("post", post);
+
+        return "post/detail"; // RequestDispathcher 로 forward한다 = request 가 복제된다.
     }
 
-    // UPDATE post SET title = ?, content = ? WHERE id =?
-    // title, content (+ primary key : id) ~ id를 찾아서(주소에 붙임)
-    // 뭘 줘야 함 - body O
-    // 다른 사람들과 협업할 때 API 문서를 작성해서 넘겨줘야 한다
-    @PutMapping("/post/{id}")
-    public String test3(String title, String content, @PathVariable int id) {
-        return "수정해주세요 : title : " + title + ", content : " + content + ", id : " + id;
-    }
-
-    // DELETE from post WHERE id = ?
-    // PK구체적으로 삭제해주세요 - body X
-    @DeleteMapping("/post/{id}")
-    public String test4(String title, String content, @PathVariable int id) {
-        return "삭제해주세요 : title : " + title + ", content : " + content + ", id : " + id;
-    }
 }
